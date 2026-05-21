@@ -1,0 +1,675 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.title }}{% endblock %}
+
+{% block content %}
+
+<div class="mb-3">
+    <a href="/" class="btn btn-outline-secondary btn-sm">
+        ← Назад к списку
+    </a>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h1 class="h3 mb-2">{{ project.title }}</h1>
+
+                <div class="text-muted">
+                    {{ project.city.name }} ·
+                    {{ project.final_customer.name }}
+                </div>
+            </div>
+
+            <div class="text-end">
+    <span class="badge fs-6" style="background-color: {{ project.status.color }};">
+        {{ project.status.name }}
+    </span>
+
+                <div class="text-muted small mt-2">
+                    Создан: {{ project.created_at|date:"d.m.Y H:i" }}
+                </div>
+
+                {% if can_edit_project %}
+                <div class="mt-3">
+                    <a href="{% url 'edit_project' project.id %}" class="btn btn-outline-primary btn-sm">
+                        Редактировать проект
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</div>
+</div>
+
+<ul class="nav nav-tabs mb-3" id="projectTabs" role="tablist">
+
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info"
+                type="button" role="tab">
+            Информация
+        </button>
+    </li>
+
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="contacts-tab" data-bs-toggle="tab" data-bs-target="#contacts"
+                type="button" role="tab">
+            Контакты
+        </button>
+    </li>
+
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="equipment-tab" data-bs-toggle="tab" data-bs-target="#equipment"
+                type="button" role="tab">
+            Оборудование
+        </button>
+    </li>
+
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="software-tab" data-bs-toggle="tab" data-bs-target="#software"
+                type="button" role="tab">
+            ПО
+        </button>
+    </li>
+
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="documents-tab" data-bs-toggle="tab" data-bs-target="#documents"
+                type="button" role="tab">
+            Документация
+        </button>
+    </li>
+
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history"
+                type="button" role="tab">
+            История
+        </button>
+    </li>
+
+</ul>
+
+<div class="tab-content" id="projectTabsContent">
+
+    <!-- Вкладка 1. Информация -->
+    <div class="tab-pane fade show active" id="info" role="tabpanel">
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <strong>Общая информация о проекте</strong>
+            </div>
+
+            <div class="card-body">
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="text-muted small">Город</div>
+                        <div>{{ project.city.name }}</div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="text-muted small">Конечный заказчик</div>
+                        <div>{{ project.final_customer.name }}</div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="text-muted small">Заказчик по договору</div>
+                        <div>{{ project.contract_customer.name }}</div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="text-muted small">Руководитель проекта</div>
+                        <div>
+                            {% if project.manager.profile.full_name %}
+                            {{ project.manager.profile.full_name }}
+                            {% else %}
+                            {{ project.manager.username }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="text-muted small">Ответственный за внедрение</div>
+                        <div>
+                            {% if project.implementer %}
+                            {% if project.implementer.profile.full_name %}
+                            {{ project.implementer.profile.full_name }}
+                            {% else %}
+                            {{ project.implementer.username }}
+                            {% endif %}
+                            {% else %}
+                            —
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="text-muted small">Статус проекта</div>
+                        <span class="badge" style="background-color: {{ project.status.color }};">
+                            {{ project.status.name }}
+                        </span>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="text-muted small">Период проведения</div>
+                        <div>
+                            {{ project.start_date|date:"d.m.Y" }}
+                            —
+                            {% if project.end_date %}
+                            {{ project.end_date|date:"d.m.Y" }}
+                            {% else %}
+                            не указано
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="text-muted small">Дата поставки</div>
+                        <div>
+                            {% if project.delivery_date %}
+                            {{ project.delivery_date|date:"d.m.Y" }}
+                            {% else %}
+                            —
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="text-muted small">Бюджет проекта</div>
+                        <div>
+                            {% if project.budget %}
+                            {{ project.budget }} ₽
+                            {% else %}
+                            —
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="text-muted small">Название ПО</div>
+                        <div>
+                            {% if project.software %}
+                            {{ project.software.name }}
+                            {% else %}
+                            —
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="text-muted small">Активная версия ПО</div>
+                        <div>
+                            {% if project.active_software_version %}
+                            {{ project.active_software_version }}
+                            {% else %}
+                            —
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="text-muted small">Ссылка на менеджер паролей</div>
+                        <div>
+                            {% if project.password_manager_link %}
+                            <a href="{{ project.password_manager_link }}" target="_blank">
+                                Открыть ссылку
+                            </a>
+                            {% else %}
+                            —
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="mb-3">
+                    <div class="text-muted small">Теги проекта</div>
+
+                    {% for tag in project.tags.all %}
+                    <span class="badge bg-secondary">{{ tag.name }}</span>
+                    {% empty %}
+                    <span class="text-muted">Теги не указаны</span>
+                    {% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    <div class="text-muted small">Цель проекта</div>
+                    <div>{{ project.goal|default:"—"|linebreaks }}</div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="text-muted small">Описание ситуации</div>
+                    <div>{{ project.situation_description|default:"—"|linebreaks }}</div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="text-muted small">Границы проекта</div>
+                    <div>{{ project.boundaries|default:"—"|linebreaks }}</div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="text-muted small">Ограничения</div>
+                    <div>{{ project.limitations|default:"—"|linebreaks }}</div>
+                </div>
+
+                <div>
+                    <div class="text-muted small">Ключевые метрики</div>
+                    <div>{{ project.key_metrics|default:"—"|linebreaks }}</div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Вкладка 2. Контакты -->
+    <div class="tab-pane fade" id="contacts" role="tabpanel">
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between">
+                <strong>Контакты проекта</strong>
+                {% if can_manage_contacts %}
+                <a href="{% url 'add_project_contact' project.id %}" class="btn btn-primary btn-sm">
+                    Добавить контакт
+                </a>
+                {% endif %}
+            </div>
+
+            <div class="card-body p-0">
+
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th>ФИО</th>
+                        <th>Должность</th>
+                        <th>Компания</th>
+                        <th>Телефон</th>
+                        <th>Email</th>
+                        <th>Примечания</th>
+                        {% if can_manage_contacts %}
+                        <th style="width: 180px;">Действия</th>
+                        {% endif %}
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for contact in contacts %}
+                    <tr>
+                        <td>{{ contact.full_name }}</td>
+                        <td>{{ contact.position|default:"—" }}</td>
+                        <td>
+                            {% if contact.company %}
+                            {{ contact.company.name }}
+                            {% else %}
+                            —
+                            {% endif %}
+                        </td>
+                        <td>{{ contact.phone|default:"—" }}</td>
+                        <td>
+                            {% if contact.email %}
+                            <a href="mailto:{{ contact.email }}">{{ contact.email }}</a>
+                            {% else %}
+                            —
+                            {% endif %}
+                        </td>
+                        <td>{{ contact.notes|default:"—" }}</td>
+                        {% if can_manage_contacts %}
+                        <td>
+                            <a href="{% url 'edit_project_contact' project.id contact.id %}"
+                               class="btn btn-outline-primary btn-sm">
+                                Ред.
+                            </a>
+
+                            <a href="{% url 'delete_project_contact' project.id contact.id %}"
+                               class="btn btn-outline-danger btn-sm">
+                                Удалить
+                            </a>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="{% if can_manage_contacts %}7{% else %}6{% endif %}" class="text-center text-muted py-4">
+                            Контакты пока не добавлены
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Вкладка 3. Оборудование -->
+    <div class="tab-pane fade" id="equipment" role="tabpanel">
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between">
+                <strong>Оборудование проекта</strong>
+                {% if can_manage_equipment %}
+                <a href="{% url 'add_project_equipment' project.id %}" class="btn btn-primary btn-sm">
+                    Добавить оборудование
+                </a>
+                {% endif %}
+            </div>
+
+            <div class="card-body p-0">
+
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Тип</th>
+                        <th>Название</th>
+                        <th>Количество</th>
+                        <th>Камер на детектор</th>
+                        <th>Описание</th>
+                        {% if can_manage_equipment %}
+                        <th style="width: 180px;">Действия</th>
+                        {% endif %}
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for item in equipment_items %}
+                    <tr>
+                        <td>{{ item.get_equipment_type_display }}</td>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.cameras_per_detector|default:"—" }}</td>
+                        <td>{{ item.description|default:"—" }}</td>
+                        {% if can_manage_equipment %}
+                        <td>
+                            <a href="{% url 'edit_project_equipment' project.id item.id %}"
+                               class="btn btn-outline-primary btn-sm">
+                                Ред.
+                            </a>
+
+                            <a href="{% url 'delete_project_equipment' project.id item.id %}"
+                               class="btn btn-outline-danger btn-sm">
+                                Удалить
+                            </a>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="{% if can_manage_equipment %}6{% else %}5{% endif %}" class="text-center text-muted py-4">
+                            Оборудование пока не добавлено
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Вкладка 4. ПО -->
+    <div class="tab-pane fade" id="software" role="tabpanel">
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <strong>Программное обеспечение</strong>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="text-muted small">Название ПО</div>
+                        <div>
+                            {% if project.software %}
+                            {{ project.software.name }}
+                            {% else %}
+                            —
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="text-muted small">Активная версия</div>
+                        <div>{{ project.active_software_version|default:"—" }}</div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="text-muted small">Описание ПО</div>
+                        <div>
+                            {% if project.software %}
+                            {{ project.software.description|default:"—" }}
+                            {% else %}
+                            —
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between">
+                <strong>История обновлений ПО</strong>
+                {% if can_manage_software %}
+                <a href="{% url 'add_software_update' project.id %}" class="btn btn-primary btn-sm">
+                    Добавить обновление
+                </a>
+                {% endif %}
+            </div>
+
+            <div class="card-body p-0">
+
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Дата</th>
+                        <th>Ответственный</th>
+                        <th>Версия</th>
+                        <th>Описание изменений</th>
+                        <th>Причина обновления</th>
+                        {% if can_manage_software %}
+                        <th style="width: 180px;">Действия</th>
+                        {% endif %}
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for update in software_updates %}
+                    <tr>
+                        <td>{{ update.update_date|date:"d.m.Y" }}</td>
+                        <td>
+                            {% if update.responsible.profile.full_name %}
+                            {{ update.responsible.profile.full_name }}
+                            {% else %}
+                            {{ update.responsible.username }}
+                            {% endif %}
+                        </td>
+                        <td>{{ update.version }}</td>
+                        <td>{{ update.changes_description }}</td>
+                        <td>{{ update.update_reason|default:"—" }}</td>
+                        {% if can_manage_software %}
+                        <td>
+                            <a href="{% url 'edit_software_update' project.id update.id %}"
+                               class="btn btn-outline-primary btn-sm">
+                                Ред.
+                            </a>
+
+                            <a href="{% url 'delete_software_update' project.id update.id %}"
+                               class="btn btn-outline-danger btn-sm">
+                                Удалить
+                            </a>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="{% if can_manage_software %}6{% else %}5{% endif %}" class="text-center text-muted py-4">
+                            История обновлений ПО пока пустая
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Вкладка 5. Документация -->
+    <div class="tab-pane fade" id="documents" role="tabpanel">
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between">
+                <strong>Документация проекта</strong>
+                {% if can_manage_documents %}
+                <a href="{% url 'upload_project_document' project.id %}" class="btn btn-primary btn-sm">
+                    Загрузить документ
+                </a>
+                {% endif %}
+            </div>
+
+            <div class="card-body p-0">
+
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Категория</th>
+                        <th>Файл</th>
+                        <th>Автор</th>
+                        <th>Комментарий</th>
+                        <th>Дата загрузки</th>
+                        <th style="width: 120px;">Скачать</th>
+                        {% if can_manage_documents %}
+                        <th style="width: 180px;">Действия</th>
+                        {% endif %}
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for document in documents %}
+                    <tr>
+                        <td>{{ document.category.name }}</td>
+                        <td>
+                            <div>
+                                <strong>{{ document.original_name|default:document.file.name }}</strong>
+                            </div>
+                            <div class="text-muted small">
+                                {{ document.file.name }}
+                            </div>
+                        </td>
+                        <td>
+                            {% if document.uploaded_by.profile.full_name %}
+                            {{ document.uploaded_by.profile.full_name }}
+                            {% else %}
+                            {{ document.uploaded_by.username }}
+                            {% endif %}
+                        </td>
+                        <td>{{ document.comment|default:"—" }}</td>
+                        <td>{{ document.uploaded_at|date:"d.m.Y H:i" }}</td>
+                        <td>
+                            <a href="{% url 'download_project_document' project.id document.id %}"
+                               class="btn btn-outline-success btn-sm">
+                                Скачать
+                            </a>
+                        </td>
+                        {% if can_manage_documents %}
+                        <td>
+                            <a href="{% url 'edit_project_document' project.id document.id %}"
+                               class="btn btn-outline-primary btn-sm">
+                                Ред.
+                            </a>
+
+                            <a href="{% url 'delete_project_document' project.id document.id %}"
+                               class="btn btn-outline-danger btn-sm">
+                                Удалить
+                            </a>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="{% if can_manage_documents %}7{% else %}6{% endif %}" class="text-center text-muted py-4">
+                            Документы пока не загружены
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Вкладка 6. История -->
+    <div class="tab-pane fade" id="history" role="tabpanel">
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <strong>История изменений</strong>
+            </div>
+
+            <div class="card-body p-0">
+
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Дата и время</th>
+                        <th>Пользователь</th>
+                        <th>Действие</th>
+                        <th>Описание</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for item in history %}
+                    <tr>
+                        <td>{{ item.created_at|date:"d.m.Y H:i" }}</td>
+                        <td>
+                            {% if item.user %}
+                            {% if item.user.profile.full_name %}
+                            {{ item.user.profile.full_name }}
+                            {% else %}
+                            {{ item.user.username }}
+                            {% endif %}
+                            {% else %}
+                            —
+                            {% endif %}
+                        </td>
+                        <td>{{ item.action }}</td>
+                        <td>{{ item.description|default:"—" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-4">
+                            История изменений пока пустая
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

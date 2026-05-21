@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+
+<div class="mb-3">
+    {% if project %}
+    <a href="{% url 'project_detail' project.id %}" class="btn btn-outline-secondary btn-sm">
+        ← Назад к проекту
+    </a>
+    {% else %}
+    <a href="{% url 'project_list' %}" class="btn btn-outline-secondary btn-sm">
+        ← Назад к списку проектов
+    </a>
+    {% endif %}
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white">
+        <strong>{{ title }}</strong>
+    </div>
+
+    <div class="card-body">
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            {% for field in form %}
+            <div class="mb-3">
+                <label class="form-label" for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>
+
+                {{ field }}
+
+                {% if field.help_text %}
+                <div class="form-text">
+                    {{ field.help_text }}
+                </div>
+                {% endif %}
+
+                {% for error in field.errors %}
+                <div class="text-danger small">
+                    {{ error }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-primary">
+                Сохранить
+            </button>
+
+            {% if project %}
+            <a href="{% url 'project_detail' project.id %}" class="btn btn-outline-secondary">
+                Отмена
+            </a>
+            {% else %}
+            <a href="{% url 'project_list' %}" class="btn btn-outline-secondary">
+                Отмена
+            </a>
+            {% endif %}
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}
